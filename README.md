@@ -7,3 +7,15 @@ Use Nuzzle to:
 * Prevent: With Fail2Ban, implement a simple but extremely effective intrusion prevention system (IPS).
 
 For more details and examples, including how to compile, install, run, and deploy as an IDS or IPS, see: https://nuzzle.hackerfactor.com/
+
+## To compile and install
+Use gcc or g++. (Should work on version 4.8 or later.)
+* gcc -Wall -o nuzzle nuzzle.c
+* g++ -Wall -o nuzzle nuzzle.c
+
+Then use:
+* sudo install nuzzle /usr/local/bin/
+
+Run with out any parameters (or use -h or -?) to see the usage.
+Since it's a packet sniffer, it needs permission to access the network interface. The easiest way to do this is with:
+* sudo nuzzle -i [interface] [other options]
