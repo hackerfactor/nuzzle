@@ -4,7 +4,7 @@ Copyright (c) 2023, Neal Krawetz, Hacker Factor
 
  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
- 1. This software is for non-commercial use only. For commercial use or distribution, contact the copyright holder for a license.
+ 1. This software is for not for resale, commercial bundling, or commercial distribution. For commercial use or distribution, contact the copyright holder for a license.
 
  2. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
