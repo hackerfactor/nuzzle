@@ -84,7 +84,15 @@
 typedef struct in_addr in_addr;
 typedef struct in6_addr in6_addr;
 
-const char *VERSION="nps-1.4"; // Nuzzle packet sniffer
+/*************************
+ nps-1.5: 2023-09-13
+   Someone figured out how to send a corruped IPv6 packet that hangs nuzzle.
+   The IPv6 extensions contain a length that should always be >= 2.
+   If the length is zero, then nuzzle enters an infinite loop as it tries to walk the extensions.
+
+ nps-1.4: First public release
+ *************************/
+const char *VERSION="nps-1.5"; // Nuzzle packet sniffer
 int Verbose=0;
 bool Anonymize=false; // should local network address be anonymized?
 
@@ -684,12 +692,17 @@ void	ProcessPacket	(size_t packetlen, const uint8_t *packet)
 	    case IPPROTO_UDPLITE:
 	    case IPPROTO_GRE:
 	    case IPPROTO_SCTP:
-		next=IPPROTO_NONE; // exit loop
+		next=IPPROTO_NONE; // known protocol, exit loop
 		break;
 	    case IPPROTO_NONE: break; // IPv6-only packet; no data (should never happen)
 	    default: /* It's an extension. Don't know, don't care. Skip it. */
 		ip_proto = packet[PacketStart+0]; // next data type
-		PacketStart += packet[PacketStart+1]*8;
+		if (packet[PacketStart+1]==0)
+		  {
+		  next=IPPROTO_NONE; // break infinite loop
+		  PacketStart += 8; // skip bad extension
+		  }
+		else { PacketStart += packet[PacketStart+1]*8; }
 		break;
 	    }
 	  }
@@ -1333,4 +1346,3 @@ int	main	(int argc, char *argv[])
   else { endprotoent(); }
   return(0);
 } /* main() */
-
