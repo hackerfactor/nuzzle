@@ -1,5 +1,5 @@
 /*************************************************************
- Nuzzle: Log indicators of intent: attacks, scans, and reconnaisance.
+ Nuzzle: Log indicators of intent: attacks, scans, and reconnaissance.
  It's a little packet sniffer that looks for stinky packets.
 
  =============================================================
