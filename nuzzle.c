@@ -85,14 +85,18 @@ typedef struct in_addr in_addr;
 typedef struct in6_addr in6_addr;
 
 /*************************
+ nps-1.6: 2024-07-01
+   User identified a problem where UDP and UDPlite could override permanent permits.
+   When linked to fail2ban, this could result in a remote user triggering a DoS.
+
  nps-1.5: 2023-09-13
-   Someone figured out how to send a corruped IPv6 packet that hangs nuzzle.
+   Someone figured out how to send a corrupted IPv6 packet that hangs nuzzle.
    The IPv6 extensions contain a length that should always be >= 2.
    If the length is zero, then nuzzle enters an infinite loop as it tries to walk the extensions.
 
  nps-1.4: First public release
  *************************/
-const char *VERSION="nps-1.5"; // Nuzzle packet sniffer
+const char *VERSION="nps-1.6"; // Nuzzle packet sniffer
 int Verbose=0;
 bool Anonymize=false; // should local network address be anonymized?
 
@@ -801,7 +805,10 @@ void	ProcessPacket	(size_t packetlen, const uint8_t *packet)
 	     Solution?
 	     Renew any temporary permit each time a permitted packet is seen.
 	     *****/
-	    if (UDPpermit[sport] > 1) { UDPpermit[dport] = PacketTime.tv_sec; }
+	    if ( (UDPpermit[dport] != 1) && (UDPpermit[sport] > 1) )
+		{
+		UDPpermit[dport] = PacketTime.tv_sec;
+		}
 	    }
 	  }
 	else { return; } // not for me
@@ -846,7 +853,10 @@ void	ProcessPacket	(size_t packetlen, const uint8_t *packet)
 	     Assume udplite works like udp.
 	     Renew the temporary permit.
 	     *****/
-	    if (UDPLITEpermit[sport] > 1) { UDPLITEpermit[dport] = PacketTime.tv_sec; }
+	    if ( (UDPLITEpermit[dport] != 1) && (UDPLITEpermit[sport] > 1) )
+		{
+		UDPLITEpermit[dport] = PacketTime.tv_sec;
+		}
 	    }
 	  }
 	else { return; } // not for me
