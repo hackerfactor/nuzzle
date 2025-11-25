@@ -85,6 +85,9 @@ typedef struct in_addr in_addr;
 typedef struct in6_addr in6_addr;
 
 /*************************
+ nps-1.7: 2025-11-25
+   Removed "register" since that's obsolete with newer g++.
+
  nps-1.6: 2024-07-01
    User identified a problem where UDP and UDPlite could override permanent permits.
    When linked to fail2ban, this could result in a remote user triggering a DoS.
@@ -96,7 +99,7 @@ typedef struct in6_addr in6_addr;
 
  nps-1.4: First public release
  *************************/
-const char *VERSION="nps-1.6"; // Nuzzle packet sniffer
+const char *VERSION="nps-1.7"; // Nuzzle packet sniffer
 int Verbose=0;
 bool Anonymize=false; // should local network address be anonymized?
 
@@ -433,7 +436,7 @@ void	SetPorts	(time_t Permit[65536], const char *arg)
  ******************************************/
 int     IsPermitAddress     (int proto, vnetaddress addr)
 {
-  register int B,b,h;
+  int B,b,h;
   for(h=0; h < MaxPermitHost; h++)
     {
     if (proto != PermitHost[h].proto) { continue; }
@@ -561,7 +564,7 @@ void	AddPermitHost	(int Family, void *addr, int MaskBits, bool IsRawAddress)
 
   // If it make it this far, then it's an allocated IPv4/IPV6 address.
   // Set Mask Bits
-  register int m,b;
+  int m,b;
   m=MaskBits;
   for(b=0; b < 16; b++)
     {
@@ -1072,7 +1075,7 @@ void	ProcessPacket	(size_t packetlen, const uint8_t *packet)
  ******************************************/
 struct ifaddrs* GetInterface    (const char *Name)
 {
-  register int family;
+  int family;
   struct ifaddrs *ifa;
   bool ListAll=false;
 
@@ -1248,7 +1251,7 @@ bool	ReadInterface	(const char *dev)
 /*******************************************************/
 int	main	(int argc, char *argv[])
 {
-  register int c;
+  int c;
   char *dev=NULL;  /* capture device name */
 
   signal(SIGINT,Shutdown); // Control-C flushes outputs like pcap
