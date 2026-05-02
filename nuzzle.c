@@ -237,7 +237,7 @@ void    SafeUser	()
     pwd = getpwnam(User);
     if (pwd && (pwd->pw_uid > 0))
       {
-      if (!setegid(pwd->pw_gid) && seteuid(pwd->pw_uid)) return;
+      if (!setegid(pwd->pw_gid) && !seteuid(pwd->pw_uid)) return;
       }
     }
 
@@ -256,7 +256,7 @@ void    SafeUser	()
   pwd = getpwnam("nobody");
   if (pwd && (pwd->pw_uid > 0))
     {
-    if (!setegid(pwd->pw_gid) && seteuid(pwd->pw_uid)) return;
+    if (!setegid(pwd->pw_gid) && !seteuid(pwd->pw_uid)) return;
     }
 
   return; // Sorry, nothing I can do.
@@ -345,6 +345,7 @@ void	PrintMsg	(uint16_t ether_type, uint8_t ttl, uint16_t flags,
   va_list argp;
   va_start(argp,Msg);
   vfprintf(stdout,Msg,argp);
+  va_end(argp);
 
   // Show flags
   if (flags & FLAG_TRUNC) { printf(", truncated"); }
@@ -424,7 +425,7 @@ void	SetPorts	(time_t Permit[65536], const char *arg)
     {
     if (!isdigit(arg[i])) { i++; continue; }
     v = atoi(arg+i);
-    if ((v > 0) && (v <= 65535)) { Permit[v]=Watch; }
+    if ((v >= 0) && (v <= 65535)) { Permit[v]=Watch; }
     while(isdigit(arg[i])) { i++; }
     }
 } /* SetPorts() */
@@ -593,6 +594,7 @@ void    MyAddresses     ()
     if (!(ifa->ifa_flags & IFF_UP)) continue; // must be up
     if (ifa->ifa_flags & IFF_NOARP) continue; // needs Layer2
     if (ifa->ifa_flags & IFF_LOOPBACK) continue; // no loopback
+    if (!ifa->ifa_addr) continue; // should never happen
     AddPermitHost(ifa->ifa_addr->sa_family,ifa->ifa_addr,-1,false);
     }
 } /* MyInterface() */
@@ -712,7 +714,7 @@ void	ProcessPacket	(size_t packetlen, const uint8_t *packet)
 		else { PacketStart += packet[PacketStart+1]*8; }
 		break;
 	    }
-	  }
+	  } // while()
 	}
 	break;
 
@@ -1092,6 +1094,7 @@ struct ifaddrs* GetInterface    (const char *Name)
     if (!(ifa->ifa_flags & IFF_UP)) continue; // must be up
     if (ifa->ifa_flags & IFF_NOARP) continue; // needs Layer2
     if (ifa->ifa_flags & IFF_LOOPBACK) continue; // no loopback
+    if (!ifa->ifa_addr) continue; // should never happen
     family=ifa->ifa_addr->sa_family;
     if (family!=AF_PACKET) continue; // must support packets
     if (ListAll)
@@ -1340,15 +1343,15 @@ int	main	(int argc, char *argv[])
   if (Verbose)
     {
     printf("DEBUG: Permitted TCP ports:");
-    for(c=0; c < 65535; c++) { if (TCPpermit[c]) { printf(" %d",c); } }
+    for(c=0; c < 65536; c++) { if (TCPpermit[c]) { printf(" %d",c); } }
     printf("\n");
 
     printf("DEBUG: Permitted UDP ports:");
-    for(c=0; c < 65535; c++) { if (UDPpermit[c]) { printf(" %d",c); } }
+    for(c=0; c < 65536; c++) { if (UDPpermit[c]) { printf(" %d",c); } }
     printf("\n");
 
     printf("DEBUG: Permitted UDPlite ports:");
-    for(c=0; c < 65535; c++) { if (UDPLITEpermit[c]) { printf(" %d",c); } }
+    for(c=0; c < 65536; c++) { if (UDPLITEpermit[c]) { printf(" %d",c); } }
     printf("\n");
     }
 
