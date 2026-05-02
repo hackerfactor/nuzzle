@@ -227,7 +227,7 @@ void    SafeUser	()
   /* Running via suid bit */
   if (getuid() != 0)
     {
-    if (!seteuid(getuid())) return;
+    if (!seteuid(getuid()) && !setegid(getgid())) return;
     }
 
   /* Running via sudo */
